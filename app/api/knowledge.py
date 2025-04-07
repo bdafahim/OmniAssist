@@ -3,10 +3,10 @@ from app.services.knowledge_service import KnowledgeService
 from app.core.config import settings
 from typing import Dict
 
-router = APIRouter()
+router = APIRouter(prefix="/knowledge", tags=["knowledge"])
 knowledge_service = KnowledgeService()
 
-@router.get("/knowledge/query")
+@router.get("/query")
 async def query_knowledge(query: str):
     """Query the knowledge base"""
     try:
@@ -15,12 +15,12 @@ async def query_knowledge(query: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/knowledge/business-type")
+@router.get("/business-type")
 async def get_business_type():
     """Get the current business type"""
     return {"business_type": settings.BUSINESS_TYPE}
 
-@router.get("/knowledge/menu")
+@router.get("/menu")
 async def get_menu():
     """Get the menu (for restaurant business type)"""
     if settings.BUSINESS_TYPE != "restaurant":
@@ -32,7 +32,7 @@ async def get_menu():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/knowledge/properties")
+@router.get("/properties")
 async def get_properties():
     """Get the properties (for real estate business type)"""
     if settings.BUSINESS_TYPE != "real_estate":
@@ -44,7 +44,7 @@ async def get_properties():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/knowledge/update")
+@router.post("/update")
 async def update_knowledge(data: Dict = Body(...)):
     """
     Update the knowledge base with new information

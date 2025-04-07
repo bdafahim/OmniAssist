@@ -1,0 +1,48 @@
+{
+  "menu": {
+    "appetizers": [
+      {
+        "name": "New Appetizer",
+        "price": 9.99,
+        "description": "A new delicious appetizer"
+      }
+    ],
+    "main_courses": [
+      {
+        "name": "Pasta Carbonara",
+        "price": 16.99,
+        "description": "Spaghetti with pancetta, egg, and parmesan"
+      },
+      {
+        "name": "Grilled Salmon",
+        "price": 22.99,
+        "description": "Fresh salmon with lemon butter sauce"
+      },
+      {
+        "name": "Beef Tenderloin",
+        "price": 29.99,
+        "description": "8oz tenderloin with mushroom sauce"
+      }
+    ],
+    "desserts": [
+      {
+        "name": "Tiramisu",
+        "price": 7.99,
+        "description": "Classic Italian dessert with coffee and mascarpone"
+      },
+      {
+        "name": "Chocolate Cake",
+        "price": 6.99,
+        "description": "Rich chocolate cake with ganache"
+      },
+      {
+        "name": "Ice Cream",
+        "price": 5.99,
+        "description": "Vanilla, chocolate, or strawberry"
+      }
+    ]
+  },
+  "hours": "Monday-Sunday: 11am-10pm",
+  "location": "123 Main St, Anytown, USA",
+  "contact": "555-123-4567"
+}
