@@ -71,12 +71,15 @@ python test_app.py
 │   │   └── knowledge_update.html   # Knowledge update form
 │   └── static/            # Static files
 ├── tests/                  # Test files
+│   ├── test_knowledge.py  # Knowledge service tests
+│   ├── test_language.py   # Language service tests
+│   ├── test_config.py     # Configuration tests
+│   ├── test_websocket.py  # WebSocket tests
+│   └── test.wav           # Test audio file
 ├── .env                    # Environment variables
 ├── requirements.txt        # Project dependencies
 ├── setup.sh                # Setup script
 ├── test_app.py             # Application test script
-├── test_knowledge.py       # Knowledge service test
-├── test_language.py        # Language service test
 └── README.md              # Project documentation
 ```
 
@@ -134,14 +137,21 @@ Once the server is running, visit:
 You can test individual components using the provided test scripts:
 
 ```bash
-# Test the knowledge base service
-python test_knowledge.py
-
-# Test the language service
-python test_language.py
 
 # Test the full application
 python test_app.py
+
+# Test the knowledge base service
+python tests/test_knowledge.py
+
+# Test the language service
+python tests/test_language.py
+
+# Test the configuration
+python tests/test_config.py
+
+# Test WebSocket functionality
+python tests/test_websocket.py
 ```
 
 ## Web Interface

@@ -2,9 +2,9 @@
   "menu": {
     "appetizers": [
       {
-        "name": "Greek Salad",
-        "price": 20.55,
-        "description": "Healthy start to a day"
+        "name": "Ceaser Salad",
+        "price": 15,
+        "description": "Healthy and good"
       }
     ],
     "main_courses": [
@@ -42,7 +42,7 @@
       }
     ]
   },
-  "hours": "",
+  "hours": "Monday-Sunday: 10am-10pm",
   "location": "123 Main St, Anytown, USA",
   "contact": "555-123-4567"
 }
