@@ -13,6 +13,7 @@
             border-radius: 5px;
             padding: 10px;
             margin-bottom: 20px;
+            position: relative;
         }
         .message {
             margin-bottom: 10px;
@@ -31,6 +32,18 @@
             font-size: 0.8em;
             color: #666;
         }
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            padding: 10px;
+            color: #666;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 5px;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
@@ -40,7 +53,7 @@
         <div class="row">
             <div class="col-md-8 offset-md-2">
                 <div class="chat-container" id="chatContainer">
-                    <!-- Messages will be displayed here -->
+                    <div class="loading" id="loadingIndicator" style="display: none;">Loading conversation...</div>
                 </div>
                 
                 <form id="messageForm" class="mb-4">
@@ -54,9 +67,13 @@
     </div>
 
     <script>
+        const TEST_PHONE_NUMBER = "+1234567890";  // Consistent test phone number
+
         // Function to add a message to the chat container
         function addMessage(role, content, timestamp) {
             const chatContainer = document.getElementById('chatContainer');
+            if (!chatContainer) return;
+
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${role}-message`;
             
@@ -75,30 +92,66 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
+        // Function to show/hide loading indicator
+        function setLoading(loading) {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            if (!loadingIndicator) return;
+            loadingIndicator.style.display = loading ? 'block' : 'none';
+        }
+
         // Function to load conversation history
         async function loadConversation() {
             try {
-                const response = await fetch('/api/v1/sms/conversation');
+                setLoading(true);
+                const response = await fetch(`/api/v1/sms/conversation?From=${encodeURIComponent(TEST_PHONE_NUMBER)}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const data = await response.json();
                 
                 const chatContainer = document.getElementById('chatContainer');
-                chatContainer.innerHTML = ''; // Clear existing messages
+                if (!chatContainer) return;
                 
-                data.messages.forEach(msg => {
-                    addMessage(msg.role, msg.content, msg.timestamp);
-                });
+                // Clear existing messages but keep the loading indicator
+                const loadingIndicator = document.getElementById('loadingIndicator');
+                chatContainer.innerHTML = '';
+                if (loadingIndicator) {
+                    chatContainer.appendChild(loadingIndicator);
+                }
+                
+                if (data.messages && data.messages.length > 0) {
+                    data.messages.forEach(msg => {
+                        addMessage(msg.role, msg.content, msg.timestamp);
+                    });
+                } else {
+                    chatContainer.innerHTML = '<div class="text-center text-muted">No messages yet</div>';
+                    if (loadingIndicator) {
+                        chatContainer.appendChild(loadingIndicator);
+                    }
+                }
             } catch (error) {
                 console.error('Error loading conversation:', error);
+                const chatContainer = document.getElementById('chatContainer');
+                if (chatContainer) {
+                    chatContainer.innerHTML = '<div class="text-center text-danger">Error loading conversation</div>';
+                    const loadingIndicator = document.getElementById('loadingIndicator');
+                    if (loadingIndicator) {
+                        chatContainer.appendChild(loadingIndicator);
+                    }
+                }
+            } finally {
+                setLoading(false);
             }
         }
 
         // Handle form submission
-        document.getElementById('messageForm').addEventListener('submit', async (e) => {
+        document.getElementById('messageForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const messageInput = document.getElementById('messageInput');
-            const message = messageInput.value.trim();
+            if (!messageInput) return;
             
+            const message = messageInput.value.trim();
             if (!message) return;
             
             try {
@@ -114,11 +167,11 @@
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: `Body=${encodeURIComponent(message)}&From=+1234567890`
+                    body: `Body=${encodeURIComponent(message)}&From=${encodeURIComponent(TEST_PHONE_NUMBER)}`
                 });
                 
                 if (!response.ok) {
-                    throw new Error('Failed to send message');
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 // Reload conversation to get the response
