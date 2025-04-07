@@ -7,11 +7,10 @@ class ConversationManager:
     def __init__(self):
         self.conversations: Dict[str, Conversation] = {}
 
-    def create_conversation(self, business_type: str) -> Conversation:
-        """
-        Create a new conversation session
-        """
-        session_id = str(uuid.uuid4())
+    
+    def create_conversation(self, business_type: str, session_id: Optional[str] = None) -> Conversation:
+        if session_id is None:
+            session_id = str(uuid.uuid4())
         conversation = Conversation(
             session_id=session_id,
             business_type=business_type

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import voice, knowledge
+from app.api import voice, knowledge, sms
 from app.core.config import settings
 
 app = FastAPI(
@@ -21,6 +21,8 @@ app.add_middleware(
 # Include routers
 app.include_router(voice.router, prefix=settings.API_V1_STR)
 app.include_router(knowledge.router, prefix=settings.API_V1_STR)
+app.include_router(sms.router, prefix=settings.API_V1_STR)
+
 
 @app.get("/")
 async def root():
