@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, WebSocket, WebSocketDisconnect, UploadFile, File
 from twilio.twiml.voice_response import VoiceResponse, Gather
 from app.services.conversation_manager import ConversationManager
 from app.services.speech_service import SpeechService
 from app.services.language_service import LanguageService
 from app.core.config import settings
+from fastapi.responses import JSONResponse
+import json
 
-router = APIRouter()
+router = APIRouter(prefix="/voice", tags=["voice"])
 conversation_manager = ConversationManager()
 speech_service = SpeechService()
 language_service = LanguageService()
@@ -89,4 +91,49 @@ async def get_conversation(session_id: str):
         history = conversation_manager.get_conversation_history(session_id)
         return {"session_id": session_id, "history": history}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) 
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            # Receive audio data
+            audio_data = await websocket.receive_bytes()
+            
+            # Process the audio and get transcription
+            transcription = await speech_service.transcribe_audio(audio_data)
+            
+            # Send back the transcription
+            await websocket.send_text(json.dumps({
+                "transcription": transcription
+            }))
+    except WebSocketDisconnect:
+        print("Client disconnected")
+    except Exception as e:
+        await websocket.send_text(json.dumps({
+            "error": str(e)
+        }))
+
+@router.post("/transcribe")
+async def transcribe_audio(file: UploadFile = File(...)):
+    try:
+        # Read the uploaded file
+        audio_data = await file.read()
+        
+        # Process the audio
+        transcription = await speech_service.transcribe_audio(audio_data)
+        
+        return JSONResponse(content={
+            "transcription": transcription
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/status")
+async def voice_status():
+    return {
+        "status": "active",
+        "model": settings.WHISPER_MODEL,
+        "service": "whisper"
+    } 

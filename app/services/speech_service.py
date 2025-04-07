@@ -47,17 +47,21 @@ class SpeechService:
         except Exception as e:
             return f"Error transcribing audio: {str(e)}"
 
-    async def process_audio_stream(self, audio_stream):
+    async def process_audio_stream(self, audio_data):
         """
-        Process a streaming audio input
+        Process audio data from either a stream or a list of chunks
         """
         try:
-            # Collect the audio data from the stream
-            audio_data = b""
-            async for chunk in audio_stream:
-                audio_data += chunk
+            # If audio_data is a list, concatenate the chunks
+            if isinstance(audio_data, list):
+                audio_bytes = b"".join(audio_data)
+            else:
+                # If it's an async iterator, collect all chunks
+                audio_bytes = b""
+                async for chunk in audio_data:
+                    audio_bytes += chunk
 
             # Transcribe the collected audio
-            return await self.transcribe_audio(audio_data)
+            return await self.transcribe_audio(audio_bytes)
         except Exception as e:
             return f"Error processing audio stream: {str(e)}" 
