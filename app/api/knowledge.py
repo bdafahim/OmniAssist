@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Body
 from app.services.knowledge_service import KnowledgeService
 from app.core.config import settings
+from typing import Dict
 
 router = APIRouter()
 knowledge_service = KnowledgeService()
@@ -40,5 +41,45 @@ async def get_properties():
     try:
         result = await knowledge_service.query_knowledge_base("properties")
         return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/knowledge/update")
+async def update_knowledge(data: Dict = Body(...)):
+    """
+    Update the knowledge base with new information
+    
+    Example request body for restaurant:
+    {
+        "menu": {
+            "appetizers": [
+                {"name": "New Appetizer", "price": 9.99, "description": "A new delicious appetizer"}
+            ]
+        },
+        "hours": "Monday-Sunday: 10am-11pm"
+    }
+    
+    Example request body for real estate:
+    {
+        "properties": [
+            {
+                "id": "4",
+                "type": "House",
+                "address": "321 Elm St, Anytown, USA",
+                "price": 400000,
+                "bedrooms": 4,
+                "bathrooms": 3,
+                "square_feet": 2500,
+                "description": "Spacious family home with pool"
+            }
+        ]
+    }
+    """
+    try:
+        success = await knowledge_service.update_knowledge_base(data)
+        if success:
+            return {"status": "success", "message": "Knowledge base updated successfully"}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to update knowledge base")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) 

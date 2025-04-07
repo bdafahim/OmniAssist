@@ -2,16 +2,28 @@ from typing import Dict, List, Optional
 import os
 import json
 from app.core.config import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 class KnowledgeService:
     def __init__(self):
         self.business_type = settings.BUSINESS_TYPE
         self.knowledge_base = self._load_knowledge_base()
+        self.knowledge_file = f"knowledge_{self.business_type}.json"
         
     def _load_knowledge_base(self) -> Dict:
         """
         Load knowledge base based on business type
         """
+        # Try to load from file first
+        try:
+            if os.path.exists(self.knowledge_file):
+                with open(self.knowledge_file, 'r') as f:
+                    return json.load(f)
+        except Exception as e:
+            logger.error(f"Error loading knowledge base from file: {str(e)}")
+            
         # Default knowledge bases for different business types
         default_knowledge_bases = {
             "restaurant": {
@@ -105,11 +117,38 @@ class KnowledgeService:
             
     async def update_knowledge_base(self, data: Dict):
         """
-        Update the knowledge base with new information
-        
-        Note: In a real implementation, this would update a database or vector store
+        Update the knowledge base with new information and persist to file
         """
-        # In a real implementation, this would update a database or vector store
-        # For now, we'll just update our in-memory knowledge base
-        for key, value in data.items():
-            self.knowledge_base[key] = value 
+        try:
+            # Update in-memory knowledge base
+            for key, value in data.items():
+                if key in self.knowledge_base:
+                    if isinstance(self.knowledge_base[key], dict) and isinstance(value, dict):
+                        # Merge dictionaries
+                        self.knowledge_base[key].update(value)
+                    elif isinstance(self.knowledge_base[key], list) and isinstance(value, list):
+                        # Merge lists
+                        self.knowledge_base[key].extend(value)
+                    else:
+                        # Replace value
+                        self.knowledge_base[key] = value
+                else:
+                    # Add new key
+                    self.knowledge_base[key] = value
+            
+            # Persist to file
+            with open(self.knowledge_file, 'w') as f:
+                json.dump(self.knowledge_base, f, indent=2)
+                
+            logger.info(f"Successfully updated knowledge base with {len(data)} items")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error updating knowledge base: {str(e)}")
+            return False
+            
+    def get_menu_data(self) -> Optional[Dict]:
+        """
+        Get menu data for the current business type
+        """
+        return self.knowledge_base.get("menu") 
