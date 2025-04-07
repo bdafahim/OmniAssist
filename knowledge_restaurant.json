@@ -2,9 +2,9 @@
   "menu": {
     "appetizers": [
       {
-        "name": "New Appetizer",
-        "price": 9.99,
-        "description": "A new delicious appetizer"
+        "name": "Icecream cone",
+        "price": 10,
+        "description": "Dessert"
       }
     ],
     "main_courses": [
@@ -42,7 +42,7 @@
       }
     ]
   },
-  "hours": "Monday-Sunday: 11am-10pm",
+  "hours": "Monday-Sunday: 10am-10pm",
   "location": "123 Main St, Anytown, USA",
   "contact": "555-123-4567"
 }

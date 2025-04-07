@@ -37,6 +37,10 @@ app.include_router(sms.router, prefix=settings.API_V1_STR)
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+@app.get("/knowledge-update", response_class=HTMLResponse)
+async def knowledge_update(request: Request):
+    return templates.TemplateResponse("knowledge_update.html", {"request": request})
+
 @app.get("/api/v1/")
 async def api_root():
     return {
