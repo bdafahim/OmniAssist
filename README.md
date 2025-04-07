@@ -1,18 +1,19 @@
 # AI Customer Service & Ordering Agent
 
-An AI-powered customer service and ordering agent that can interact with customers via phone calls in a human-like manner.
+An AI-powered customer service and ordering agent that can interact with customers via phone calls and SMS in a human-like manner.
 
 ## Features
 
 - Multi-business adaptability (restaurant, real estate, etc.)
+- SMS-based customer interaction
 - Human-like conversational ability
+- Dynamic knowledge base integration with web interface
 - Real-time call handling with Twilio
-- Dynamic knowledge base integration
 - Context retention & memory
 - Ordering & inquiry handling
 - Sentiment analysis
 - Speech-to-text conversion with Whisper
-- Text-to-speech capability (placeholder for Piper integration)
+- Text-to-speech capability
 
 ## Setup Instructions
 
@@ -53,6 +54,7 @@ python test_app.py
 │   ├── main.py              # FastAPI application entry point
 │   ├── api/                 # API routes
 │   │   ├── voice.py         # Voice call handling
+│   │   ├── sms.py          # SMS handling
 │   │   └── knowledge.py     # Knowledge base API
 │   ├── core/               # Core functionality
 │   │   └── config.py       # Configuration settings
@@ -64,7 +66,10 @@ python test_app.py
 │   │   ├── language_service.py     # Language processing
 │   │   ├── speech_service.py       # Speech-to-text
 │   │   └── tts_service.py          # Text-to-speech
-│   └── utils/              # Utility functions
+│   ├── templates/          # HTML templates
+│   │   ├── index.html     # Main chat interface
+│   │   └── knowledge_update.html   # Knowledge update form
+│   └── static/            # Static files
 ├── tests/                  # Test files
 ├── .env                    # Environment variables
 ├── requirements.txt        # Project dependencies
@@ -75,11 +80,54 @@ python test_app.py
 └── README.md              # Project documentation
 ```
 
+## Features in Detail
+
+### SMS Service
+- Real-time SMS conversation handling
+- Context-aware responses
+- Conversation history tracking
+- Phone number normalization
+- Error handling and logging
+- Test mode with consistent phone number
+
+### Knowledge Base Management
+- Web interface for updating business information
+- Support for multiple business types (restaurant, real estate)
+- Dynamic form generation based on business type
+- Real-time validation and error handling
+- Success/failure notifications
+- Persistent storage of business data
+
+#### Restaurant Business Type
+- Menu management (appetizers, main courses, etc.)
+- Business hours updates
+- Price and description management
+- Special requests handling
+
+#### Real Estate Business Type
+- Property listing management
+- Property details (price, bedrooms, bathrooms, etc.)
+- Property descriptions
+- Location information
+
 ## API Documentation
 
 Once the server is running, visit:
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
+
+### Key API Endpoints
+
+#### SMS Endpoints
+- `POST /api/v1/sms/` - Handle incoming SMS messages
+- `GET /api/v1/sms/conversation` - Get conversation history
+- `GET /api/v1/sms/status` - Check SMS service status
+
+#### Knowledge Base Endpoints
+- `POST /api/v1/knowledge/update` - Update business information
+- `GET /api/v1/knowledge/query` - Query the knowledge base
+- `GET /api/v1/knowledge/menu` - Get menu information (restaurant)
+- `GET /api/v1/knowledge/properties` - Get property listings (real estate)
 
 ## Testing
 
@@ -96,18 +144,39 @@ python test_language.py
 python test_app.py
 ```
 
+## Web Interface
+
+The application provides a web interface at http://localhost:8000/ with:
+
+1. Chat Interface
+   - Real-time message display
+   - Message history
+   - Loading indicators
+   - Error handling
+
+2. Knowledge Update Interface
+   - Business type selection
+   - Dynamic form generation
+   - Real-time validation
+   - Success/error notifications
+   - Modal dialog interface
+
 ## Business Types
 
 The system supports different business types, which can be configured in the `.env` file:
 
 - `restaurant`: For restaurant ordering and inquiries
-- `real_estate`: For real estate property inquiries and viewing scheduling
+  - Menu management
+  - Order handling
+  - Special requests
+  - Business hours
 
-## Next Steps
+- `real_estate`: For real estate property inquiries
+  - Property listings
+  - Viewing scheduling
+  - Property details
+  - Location information
 
-- Integrate with Llama for more advanced language processing
-- Integrate with Pinecone for vector-based knowledge retrieval
-- Integrate with Piper for text-to-speech
-- Add database integration for persistent storage
-- Implement authentication and authorization
-- Add more business types and knowledge bases 
+Note: Currently, the system is configured for the restaurant business type by default, but it can be easily adapted for other business types by modifying the `BUSINESS_TYPE` variable in the `.env` file. The knowledge base and conversation handling are designed to be extensible for different business domains.
+
+

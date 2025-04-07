@@ -2,9 +2,9 @@
   "menu": {
     "appetizers": [
       {
-        "name": "Icecream cone",
-        "price": 10,
-        "description": "Dessert"
+        "name": "Greek Salad",
+        "price": 20.55,
+        "description": "Healthy start to a day"
       }
     ],
     "main_courses": [
@@ -42,7 +42,7 @@
       }
     ]
   },
-  "hours": "Monday-Sunday: 10am-10pm",
+  "hours": "",
   "location": "123 Main St, Anytown, USA",
   "contact": "555-123-4567"
 }
