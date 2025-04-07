@@ -1,7 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 from app.api import voice, knowledge, sms
 from app.core.config import settings
+import os
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -18,14 +22,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mount static files
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+# Configure templates
+templates = Jinja2Templates(directory="app/templates")
+
 # Include routers
 app.include_router(voice.router, prefix=settings.API_V1_STR)
 app.include_router(knowledge.router, prefix=settings.API_V1_STR)
 app.include_router(sms.router, prefix=settings.API_V1_STR)
 
+@app.get("/", response_class=HTMLResponse)
+async def root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get("/")
-async def root():
+@app.get("/api/v1/")
+async def api_root():
     return {
         "message": "AI Customer Service & Ordering Agent API",
         "business_type": settings.BUSINESS_TYPE,
